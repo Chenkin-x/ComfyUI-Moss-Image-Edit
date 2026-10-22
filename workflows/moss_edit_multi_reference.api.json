@@ -1,72 +1,194 @@
 {
   "1": {
-    "class_type": "MossImageEditLoader",
+    "class_type": "UNETLoader",
     "inputs": {
-      "snapshot_dir": "moss_image/MOSS-Image-SFT",
-      "adapter_dir": "moss_image/Moss-Image-Edit"
-    },
-    "_meta": {
-      "title": "Load MOSS Image Edit"
+      "unet_name": "moss\\mossImage_sft_pruned_int8.safetensors",
+      "weight_dtype": "default"
     }
   },
   "2": {
-    "class_type": "LoadImage",
+    "class_type": "CLIPLoader",
     "inputs": {
-      "image": "reference_1.png"
-    },
-    "_meta": {
-      "title": "Reference 1"
+      "clip_name": "moss\\qwen3.5_9b_int8_convrot.safetensors",
+      "type": "moss_image",
+      "device": "default"
     }
   },
   "3": {
-    "class_type": "LoadImage",
+    "class_type": "VAELoader",
     "inputs": {
-      "image": "reference_2.png"
-    },
-    "_meta": {
-      "title": "Reference 2"
+      "vae_name": "flux2-vae_small.safetensors"
     }
   },
   "4": {
-    "class_type": "MossImageEdit",
+    "class_type": "ModelPatchLoader",
+    "inputs": {
+      "name": "moss_image_edit.safetensors"
+    }
+  },
+  "5": {
+    "class_type": "ApplyMossImageEdit",
     "inputs": {
       "model": [
         "1",
         0
       ],
-      "reference_1": [
-        "2",
-        0
-      ],
-      "prompt": "Dress the person in image 1 in the outfit from image 2. Preserve the person's identity and pose.",
-      "negative_prompt": "",
-      "width": 512,
-      "height": 512,
-      "steps": 30,
-      "cfg": 4.0,
-      "seed": 42,
-      "reference_max_edge": 512,
-      "inference_shift": 5.0,
-      "reference_2": [
-        "3",
-        0
-      ]
-    },
-    "_meta": {
-      "title": "Describe the edit"
-    }
-  },
-  "5": {
-    "class_type": "SaveImage",
-    "inputs": {
-      "images": [
+      "model_patch": [
         "4",
         0
       ],
-      "filename_prefix": "MOSS-Image-Edit/multi_reference"
-    },
-    "_meta": {
-      "title": "Edited image"
+      "vae": [
+        "3",
+        0
+      ],
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "10",
+        0
+      ],
+      "image": [
+        "6",
+        0
+      ],
+      "reference_max_edge": 512,
+      "strength": 1.0,
+      "reference_images.reference_0": [
+        "19",
+        0
+      ]
+    }
+  },
+  "6": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "example.png"
+    }
+  },
+  "7": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    }
+  },
+  "9": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "Change only the pink dress to bright red. Keep the character, face, hair, pose, background and composition unchanged."
+    }
+  },
+  "10": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": ""
+    }
+  },
+  "13": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": [
+        "17",
+        0
+      ],
+      "height": [
+        "17",
+        1
+      ],
+      "batch_size": 1
+    }
+  },
+  "14": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "18",
+        0
+      ],
+      "positive": [
+        "5",
+        1
+      ],
+      "negative": [
+        "5",
+        2
+      ],
+      "latent_image": [
+        "13",
+        0
+      ],
+      "seed": 42,
+      "steps": 30,
+      "cfg": 4.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1.0
+    }
+  },
+  "15": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "14",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "16": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "15",
+        0
+      ],
+      "filename_prefix": "MOSS-Image-Edit/multi-reference"
+    }
+  },
+  "17": {
+    "class_type": "GetImageSize",
+    "inputs": {
+      "image": [
+        "7",
+        0
+      ]
+    }
+  },
+  "18": {
+    "class_type": "SkipLayerGuidanceDiTSimple",
+    "inputs": {
+      "model": [
+        "5",
+        0
+      ],
+      "double_layers": "",
+      "single_layers": "22",
+      "start_percent": 0.0,
+      "end_percent": 1.0
+    }
+  },
+  "19": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "example_reference.png"
     }
   }
 }
