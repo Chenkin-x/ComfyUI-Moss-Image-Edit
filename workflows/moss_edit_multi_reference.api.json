@@ -1,0 +1,72 @@
+{
+  "1": {
+    "class_type": "MossImageEditLoader",
+    "inputs": {
+      "snapshot_dir": "moss_image/MOSS-Image-SFT",
+      "adapter_dir": "moss_image/Moss-Image-Edit"
+    },
+    "_meta": {
+      "title": "Load MOSS Image Edit"
+    }
+  },
+  "2": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "reference_1.png"
+    },
+    "_meta": {
+      "title": "Reference 1"
+    }
+  },
+  "3": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "reference_2.png"
+    },
+    "_meta": {
+      "title": "Reference 2"
+    }
+  },
+  "4": {
+    "class_type": "MossImageEdit",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "reference_1": [
+        "2",
+        0
+      ],
+      "prompt": "Dress the person in image 1 in the outfit from image 2. Preserve the person's identity and pose.",
+      "negative_prompt": "",
+      "width": 512,
+      "height": 512,
+      "steps": 30,
+      "cfg": 4.0,
+      "seed": 42,
+      "reference_max_edge": 512,
+      "inference_shift": 5.0,
+      "reference_2": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Describe the edit"
+    }
+  },
+  "5": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "4",
+        0
+      ],
+      "filename_prefix": "MOSS-Image-Edit/multi_reference"
+    },
+    "_meta": {
+      "title": "Edited image"
+    }
+  }
+}
