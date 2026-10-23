@@ -2,6 +2,14 @@
 
 [English](README.en.md) · [编辑效果](https://github.com/Chenkin-x/Moss-Image-Edit)
 
+> [!IMPORTANT]
+> **ComfyUI 官方已支持 MOSS-Image Edit**，详见已合并的 [ComfyUI #17296](https://github.com/Comfy-Org/ComfyUI/pull/17296)。
+> 请将 **ComfyUI 本体**更新到包含该改动的最新版本，重启并刷新页面后使用官方节点。在 **Text Encode MOSS-Image Edit** 中，将 `edit_format` 设为 **Moss-Image-Edit**。
+
+**训练代码：** [Chenkin-x/Moss-Image-Edit](https://github.com/Chenkin-x/Moss-Image-Edit) · [训练入口 `train.py`](https://github.com/Chenkin-x/Moss-Image-Edit/blob/main/train.py) · [训练配置 `configs/train.json`](https://github.com/Chenkin-x/Moss-Image-Edit/blob/main/configs/train.json)。
+
+以下是本仓库自定义节点与示例工作流的使用说明。
+
 通过官方加载器和 KSampler 使用 MOSS Edit。**Apply MOSS Edit** 集中接收模型、补丁、VAE、正负条件、待编辑原图和可选的多张附加参考图，输出 `MODEL / positive / negative`，无需手动复制参考 latent 连线。
 
 ## 标准工作流：下载 JSON / 查看完整连线

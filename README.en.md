@@ -2,6 +2,14 @@
 
 [简体中文](README.md) · [Edit examples](https://github.com/Chenkin-x/Moss-Image-Edit)
 
+> [!IMPORTANT]
+> **ComfyUI now officially supports MOSS-Image Edit**, added in the merged [ComfyUI #17296](https://github.com/Comfy-Org/ComfyUI/pull/17296).
+> Update **ComfyUI itself** to the latest version containing this change, then restart and refresh the page to use the official nodes. In **Text Encode MOSS-Image Edit**, set `edit_format` to **Moss-Image-Edit**.
+
+**Training code:** [Chenkin-x/Moss-Image-Edit](https://github.com/Chenkin-x/Moss-Image-Edit) · [Training entry point: `train.py`](https://github.com/Chenkin-x/Moss-Image-Edit/blob/main/train.py) · [Training configuration: `configs/train.json`](https://github.com/Chenkin-x/Moss-Image-Edit/blob/main/configs/train.json).
+
+The following instructions cover this repository's custom nodes and example workflows.
+
 Use MOSS Edit with native model loaders and KSampler. **Apply MOSS Edit** accepts the model, patch, VAE, positive/negative conditioning a source image and optional additional reference images, and returns `MODEL / positive / negative`. Reference conditioning is encoded once and shared automatically.
 
 ## Standard workflows: JSON downloads and full canvas previews
