@@ -16,7 +16,7 @@ Use MOSS Edit with native model loaders and KSampler. **Apply MOSS Edit** accept
 
 [![Complete SFT single-image workflow](examples/moss_edit_single_reference.png)](examples/moss_edit_single_reference.png)
 
-**[Open examples: all three previews, input images and instructions →](examples/README.md)**
+**[Open examples: all three previews, input images and instructions →](examples/README.en.md)**
 
 On the JSON page, click **Download raw file**, not Save webpage. Each PNG also embeds its matching workflow and can be downloaded at original resolution and dropped into ComfyUI. The `.api.json` files are for API requests, not canvas imports. These workflows require the native node implementation in this branch.
 
