@@ -1,16 +1,16 @@
 {
-  "last_node_id": 4,
-  "last_link_id": 3,
+  "last_node_id": 32,
+  "last_link_id": 20,
   "nodes": [
     {
       "id": 1,
-      "type": "MossImageEditLoader",
+      "type": "UNETLoader",
       "pos": [
         40,
-        80
+        60
       ],
       "size": [
-        390,
+        310,
         110
       ],
       "flags": {},
@@ -19,35 +19,32 @@
       "inputs": [],
       "outputs": [
         {
-          "name": "model",
-          "type": "MOSS_EDIT_MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
           "links": [
             1
           ],
           "slot_index": 0
         }
       ],
-      "title": "1 · Load MOSS Image Edit",
       "properties": {
-        "Node name for S&R": "MossImageEditLoader"
+        "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "moss_image/MOSS-Image-SFT",
-        "moss_image/Moss-Image-Edit"
-      ],
-      "color": "#253c45",
-      "bgcolor": "#344e59"
+        "moss\\mossImage_sft_pruned_int8.safetensors",
+        "default"
+      ]
     },
     {
       "id": 2,
-      "type": "LoadImage",
+      "type": "CLIPLoader",
       "pos": [
         40,
-        300
+        510
       ],
       "size": [
-        390,
-        380
+        310,
+        170
       ],
       "flags": {},
       "order": 1,
@@ -55,135 +52,679 @@
       "inputs": [],
       "outputs": [
         {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            8,
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "moss\\qwen3.5_9b_int8_convrot.safetensors",
+        "moss_image",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        360
+      ],
+      "size": [
+        310,
+        110
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            3,
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "flux2-vae_small.safetensors"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "ModelPatchLoader",
+      "pos": [
+        40,
+        210
+      ],
+      "size": [
+        310,
+        110
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL_PATCH",
+          "type": "MODEL_PATCH",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelPatchLoader"
+      },
+      "widgets_values": [
+        "moss_image_edit.safetensors"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ApplyMossImageEdit",
+      "pos": [
+        850,
+        280
+      ],
+      "size": [
+        360,
+        290
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "model_patch",
+          "type": "MODEL_PATCH",
+          "link": 2
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 3
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 4
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 5
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 6,
+          "label": "待编辑图像 / source image"
+        },
+        {
+          "name": "reference_images.reference_0",
+          "type": "IMAGE",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            20
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            13
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            14
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ApplyMossImageEdit"
+      },
+      "widgets_values": [
+        512,
+        1.0
+      ],
+      "title": "Apply MOSS Edit · 原图 + 可选参考图"
+    },
+    {
+      "id": 6,
+      "type": "LoadImage",
+      "pos": [
+        40,
+        820
+      ],
+      "size": [
+        310,
+        400
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            2
+            6,
+            7
           ],
           "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
+          "links": [],
           "slot_index": 1
         }
       ],
-      "title": "2 · Reference 1",
       "properties": {
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "reference.png",
+        "example.png",
         "image"
-      ],
-      "color": "#253c45",
-      "bgcolor": "#344e59"
+      ]
     },
     {
-      "id": 3,
-      "type": "MossImageEdit",
+      "id": 7,
+      "type": "ImageScaleToTotalPixels",
       "pos": [
-        510,
-        80
+        420,
+        1090
       ],
       "size": [
-        460,
-        690
+        310,
+        170
       ],
       "flags": {},
-      "order": 2,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
-          "name": "model",
-          "type": "MOSS_EDIT_MODEL",
-          "link": 1
-        },
-        {
-          "name": "reference_1",
+          "name": "image",
           "type": "IMAGE",
-          "link": 2
-        },
-        {
-          "name": "reference_2",
-          "type": "IMAGE",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "reference_3",
-          "type": "IMAGE",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "reference_4",
-          "type": "IMAGE",
-          "shape": 7,
-          "link": null
+          "link": 7
         }
       ],
       "outputs": [
         {
-          "name": "image",
+          "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            3
+            19
           ],
           "slot_index": 0
         }
       ],
-      "title": "3 · Describe the edit",
       "properties": {
-        "Node name for S&R": "MossImageEdit"
+        "Node name for S&R": "ImageScaleToTotalPixels"
       },
       "widgets_values": [
-        "Change the background to a sunny beach, preserving the person's identity and pose.",
-        "",
-        512,
-        512,
-        30,
-        4.0,
-        42,
-        "fixed",
-        512,
-        5.0
+        "lanczos",
+        1.0,
+        16
       ],
-      "color": "#234238",
-      "bgcolor": "#345d4f"
+      "title": "输出尺寸：缩放图像（像素）· 1MP / 对齐16"
     },
     {
-      "id": 4,
-      "type": "SaveImage",
+      "id": 9,
+      "type": "CLIPTextEncode",
       "pos": [
-        1050,
-        80
+        420,
+        530
       ],
       "size": [
-        480,
-        690
+        340,
+        190
       ],
       "flags": {},
-      "order": 3,
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "Change only the pink dress to bright red. Keep the character, face, hair, pose, background and composition unchanged."
+      ],
+      "title": "编辑指令（正面）"
+    },
+    {
+      "id": 10,
+      "type": "CLIPTextEncode",
+      "pos": [
+        420,
+        780
+      ],
+      "size": [
+        340,
+        190
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ],
+      "title": "负面提示词（可留空）"
+    },
+    {
+      "id": 13,
+      "type": "EmptyFlux2LatentImage",
+      "pos": [
+        1200,
+        880
+      ],
+      "size": [
+        310,
+        170
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 10,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 11,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyFlux2LatentImage"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        1
+      ],
+      "title": "空 FLUX.2 latent · 跟随输出尺寸"
+    },
+    {
+      "id": 14,
+      "type": "KSampler",
+      "pos": [
+        1640,
+        280
+      ],
+      "size": [
+        310,
+        315
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 12
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 13
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 14
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 15
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        42,
+        "fixed",
+        30,
+        4.0,
+        "euler",
+        "normal",
+        1.0
+      ]
+    },
+    {
+      "id": 15,
+      "type": "VAEDecode",
+      "pos": [
+        2010,
+        280
+      ],
+      "size": [
+        310,
+        170
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 16
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 16,
+      "type": "SaveImage",
+      "pos": [
+        2380,
+        280
+      ],
+      "size": [
+        520,
+        580
+      ],
+      "flags": {},
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 3
+          "link": 18
         }
       ],
-      "outputs": [],
-      "title": "4 · Edited image",
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
       "properties": {
         "Node name for S&R": "SaveImage"
       },
       "widgets_values": [
-        "MOSS-Image-Edit/single_reference"
+        "MOSS-Image-Edit/integrated-1mp"
+      ]
+    },
+    {
+      "id": 17,
+      "type": "GetImageSize",
+      "pos": [
+        850,
+        880
       ],
-      "color": "#3c3047",
-      "bgcolor": "#564360"
+      "size": [
+        310,
+        170
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            11
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": [],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize"
+      },
+      "widgets_values": [],
+      "title": "读取输出宽高"
+    },
+    {
+      "id": 18,
+      "type": "SkipLayerGuidanceDiTSimple",
+      "pos": [
+        1250,
+        280
+      ],
+      "size": [
+        320,
+        220
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SkipLayerGuidanceDiTSimple"
+      },
+      "widgets_values": [
+        "",
+        "22",
+        0.0,
+        1.0
+      ],
+      "title": "跳过层引导（DiT简化）· 启用 / 第22层"
+    },
+    {
+      "id": 30,
+      "type": "Note",
+      "pos": [
+        820,
+        20
+      ],
+      "size": [
+        740,
+        230
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "properties": {},
+      "widgets_values": [
+        "图像输入顺序与多图入口\n待编辑图像 image 始终在前；附加 reference_0、1、2… 按数值顺序加入。\n附加图可留空，连接后动态增加端口；每图编码一次并同步给正负条件。多图实际参与推理，效果取决于 LoRA 训练。\n每端口通常接一张图。IMAGE批次会展开为多张参考，不是分别出图。100个附加口是当前框架限制，不是推荐数量。\n原图/参考图是界面约定，模型理解仍取决于训练与编辑指令。输出尺寸跟随原图的独立缩放分支。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 31,
+      "type": "Note",
+      "pos": [
+        820,
+        1110
+      ],
+      "size": [
+        800,
+        300
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "properties": {},
+      "widgets_values": [
+        "参考分辨率 ≠ 输出分辨率\n原图直接接 Apply，reference_max_edge=512：参考长边上限，只缩小不放大，不裁剪，宽高对齐16。\n输出分支的“缩放图像（像素）”：megapixels=1.0，resolution_steps=16；其宽高接空 latent。这里不会将1MP图作为参考编码。\n1MP 约为 1024×1024；非方图保持宽高比并各自取16倍数，总像素允许小幅偏差。\nMOSS 的 FLUX.2 latent 网格对应像素宽高 / 16；不是要求 latent 网格本身再为16倍数。\n提高 reference_max_edge 属于参考分辨率实验；能运行不代表已经验证了质量。\n若参考与输出尺度不同，可能出现构图变化；可先用512参考 / 0.25MP输出对照。提高参考上限不会主动放大小图，1MP参考需输入足够尺寸的图。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 32,
+      "type": "Note",
+      "pos": [
+        1570,
+        20
+      ],
+      "size": [
+        750,
+        225
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "properties": {},
+      "widgets_values": [
+        "采样默认值与显式 SLG\n受支持版本的 ComfyUI 识别 MOSS 后自动配置 inference_shift=5.0、multiplier=1。这是模型默认值，不是按分辨率动态估算；标准工作流无需额外 shift 节点。\n只有自定义 shift 时才在 SLG 前加 ModelSamplingAuraFlow（不要用 ModelSamplingSD3）。\n“跳过层引导（DiT简化）”：single_layers=22（从0计数），double_layers 留空，start=0，end=1。SLG 是底模官方建议，Edit 质量需对照测试；清空 single_layers 或右键旁路即可关闭。\nApply 不隐藏启用 SLG。起点：Euler / normal，30 steps，CFG 4，denoise 1。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -191,72 +732,171 @@
       1,
       1,
       0,
-      3,
+      5,
       0,
-      "MOSS_EDIT_MODEL"
+      "MODEL"
     ],
     [
       2,
-      2,
-      0,
-      3,
-      1,
-      "IMAGE"
-    ],
-    [
-      3,
-      3,
-      0,
       4,
       0,
+      5,
+      1,
+      "MODEL_PATCH"
+    ],
+    [
+      3,
+      3,
+      0,
+      5,
+      2,
+      "VAE"
+    ],
+    [
+      4,
+      9,
+      0,
+      5,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      10,
+      0,
+      5,
+      4,
+      "CONDITIONING"
+    ],
+    [
+      6,
+      6,
+      0,
+      5,
+      5,
       "IMAGE"
+    ],
+    [
+      7,
+      6,
+      0,
+      7,
+      0,
+      "IMAGE"
+    ],
+    [
+      8,
+      2,
+      0,
+      9,
+      0,
+      "CLIP"
+    ],
+    [
+      9,
+      2,
+      0,
+      10,
+      0,
+      "CLIP"
+    ],
+    [
+      10,
+      17,
+      0,
+      13,
+      0,
+      "INT"
+    ],
+    [
+      11,
+      17,
+      1,
+      13,
+      1,
+      "INT"
+    ],
+    [
+      12,
+      18,
+      0,
+      14,
+      0,
+      "MODEL"
+    ],
+    [
+      13,
+      5,
+      1,
+      14,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      14,
+      5,
+      2,
+      14,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      15,
+      13,
+      0,
+      14,
+      3,
+      "LATENT"
+    ],
+    [
+      16,
+      14,
+      0,
+      15,
+      0,
+      "LATENT"
+    ],
+    [
+      17,
+      3,
+      0,
+      15,
+      1,
+      "VAE"
+    ],
+    [
+      18,
+      15,
+      0,
+      16,
+      0,
+      "IMAGE"
+    ],
+    [
+      19,
+      7,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      5,
+      0,
+      18,
+      0,
+      "MODEL"
     ]
   ],
-  "groups": [
-    {
-      "title": "Model & references",
-      "bounding": [
-        20,
-        20,
-        430,
-        690
-      ],
-      "color": "#516d7b",
-      "font_size": 24,
-      "flags": {}
-    },
-    {
-      "title": "Edit",
-      "bounding": [
-        490,
-        20,
-        500,
-        790
-      ],
-      "color": "#507b69",
-      "font_size": 24,
-      "flags": {}
-    },
-    {
-      "title": "Result",
-      "bounding": [
-        1030,
-        20,
-        520,
-        790
-      ],
-      "color": "#776382",
-      "font_size": 24,
-      "flags": {}
-    }
-  ],
+  "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.75,
+      "scale": 0.6,
       "offset": [
-        30,
-        30
+        40,
+        60
       ]
     }
   },
