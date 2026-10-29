@@ -35,7 +35,15 @@ def edit_forward(model, x, timestep, context, transformer_options=None, referenc
         ids[:, 0] = index + 1
         ids[:, 2] = (torch.arange(h, device=device, dtype=torch.float32) - (h - 1) / 2).repeat_interleave(w)
         ids[:, 3] = (torch.arange(w, device=device, dtype=torch.float32) - (w - 1) / 2).repeat(h)
-        positions.append(model.pe_embedder(ids.unsqueeze(0)).transpose(1, 2).contiguous())
+        if hasattr(model, "pe_embedder"):
+            ref_pe = model.pe_embedder(ids.unsqueeze(0)).transpose(1, 2).contiguous()
+        else:
+            from comfy.ldm.flux.math import rope
+            ref_pe = torch.cat([
+                rope(ids.unsqueeze(0)[..., axis], dim, 10000)
+                for axis, dim in enumerate(model.rope_axes_dim)
+            ], dim=-3).unsqueeze(1).transpose(1, 2).contiguous()
+        positions.append(ref_pe)
     prefix_length = sum(value.shape[1] for value in prefixes)
     mod = tuple(torch.cat((ref.expand(-1, prefix_length, -1), target.expand(-1, body.shape[1], -1)), dim=1)
                 for ref, target in zip(ref_mod, body_mod))
