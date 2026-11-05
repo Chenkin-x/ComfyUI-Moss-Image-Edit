@@ -3,6 +3,7 @@ from functools import partial
 
 import torch
 
+import comfy.ldm.flux.math
 import comfy.model_prefetch
 from comfy.ldm.flux.layers import timestep_embedding
 from comfy.ldm.moss_image.model import modulated_rms_norm
@@ -35,7 +36,16 @@ def edit_forward(model, x, timestep, context, transformer_options=None, referenc
         ids[:, 0] = index + 1
         ids[:, 2] = (torch.arange(h, device=device, dtype=torch.float32) - (h - 1) / 2).repeat_interleave(w)
         ids[:, 3] = (torch.arange(w, device=device, dtype=torch.float32) - (w - 1) / 2).repeat(h)
-        positions.append(model.pe_embedder(ids.unsqueeze(0)).transpose(1, 2).contiguous())
+        ids = ids.unsqueeze(0)
+        # 兼容 v0.42.5 的 pe_embedder 与 v0.43.2 的 rope_axes_dim；按实际接口选择分支。
+        # 新接口沿用旧 EmbedND 的逐轴 RoPE 算法和 theta=10000，保留参考图训练频率。
+        # 两条路径均输出相同的维度布局，保留参考图编号及居中的空间坐标。
+        if hasattr(model, "pe_embedder"):
+            pe_ref = model.pe_embedder(ids)
+        else:
+            pe_ref = torch.cat([comfy.ldm.flux.math.rope(ids[..., i], d, 10000)
+                                for i, d in enumerate(model.rope_axes_dim)], dim=-3).unsqueeze(1)
+        positions.append(pe_ref.transpose(1, 2).contiguous())
     prefix_length = sum(value.shape[1] for value in prefixes)
     mod = tuple(torch.cat((ref.expand(-1, prefix_length, -1), target.expand(-1, body.shape[1], -1)), dim=1)
                 for ref, target in zip(ref_mod, body_mod))
